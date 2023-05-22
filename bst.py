@@ -196,4 +196,10 @@ class BinarySearchTree(Generic[K, I]):
         """
         Finds the kth smallest value by key in the subtree rooted at current.
         """
-        raise NotImplementedError()
+        left_size = self.get_subtree_size(current.left)
+        if k == left_size + 1:
+            return current
+        elif k <= left_size + 1:
+            return self.kth_smallest(k, current.left)
+        else:
+            return self.kth_smallest(k - left_size - 1, current.right)
