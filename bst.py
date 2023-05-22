@@ -90,11 +90,14 @@ class BinarySearchTree(Generic[K, I]):
         """
         if current is None:  # base case: at the leaf
             current = TreeNode(key, item=item)
+            current.subtree_size = 1
             self.length += 1
         elif key < current.key:
             current.left = self.insert_aux(current.left, key, item)
+            current.subtree_size = 1 + self.get_subtree_size(current.left) + self.get_subtree_size(current.right)
         elif key > current.key:
             current.right = self.insert_aux(current.right, key, item)
+            current.subtree_size = 1 + self.get_subtree_size(current.left) + self.get_subtree_size(current.right)
         else:  # key == current.key
             raise ValueError('Inserting duplicate item')
         return current
@@ -131,21 +134,38 @@ class BinarySearchTree(Generic[K, I]):
             current.item = succ.item
             current.right = self.delete_aux(current.right, succ.key)
 
+        current.subtree_size = 1 + self.get_subtree_size(current.left) + self.get_subtree_size(current.right)
         return current
-
+    def get_subtree_size(self, node: TreeNode) -> int:
+        """
+            Returns the size of the subtree rooted at current.
+        """
+        if node is None:
+            return 0
+        else:
+            return node.subtree_size
+        
     def get_successor(self, current: TreeNode) -> TreeNode:
         """
             Get successor of the current node.
             It should be a child node having the smallest key among all the
             larger keys.
         """
-        raise NotImplementedError()
+        if current is None: 
+            return None
+        if current.right is None:
+            return self.get_minimal(current.right)
+        return None
 
     def get_minimal(self, current: TreeNode) -> TreeNode:
         """
             Get a node having the smallest key in the current sub-tree.
         """
-        raise NotImplementedError()
+        if current is None :
+            return None
+        while current.left is None :
+            current = current.left
+        return current
 
     def is_leaf(self, current: TreeNode) -> bool:
         """ Simple check whether or not the node is a leaf. """
