@@ -155,7 +155,16 @@ class BinarySearchTree(Generic[K, I]):
             return None
         if current.right is None:
             return self.get_minimal(current.right)
-        return None
+        else: 
+            ancestor = None
+            node = self.root
+            while node is not None: 
+                if current.key < node.key:
+                    ancestor = node
+                    node = node.left
+                else: 
+                    node = node.right
+            return ancestor
 
     def get_minimal(self, current: TreeNode) -> TreeNode:
         """
@@ -163,7 +172,7 @@ class BinarySearchTree(Generic[K, I]):
         """
         if current is None :
             return None
-        while current.left is None :
+        while current.left is not None :
             current = current.left
         return current
 
