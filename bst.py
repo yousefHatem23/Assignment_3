@@ -8,7 +8,7 @@ from __future__ import annotations
 __author__ = 'Brendon Taylor, modified by Alexey Ignatiev, further modified by Jackson Goerner'
 __docformat__ = 'reStructuredText'
 
-from typing import TypeVar, Generic
+from typing import List,TypeVar, Generic
 from node import TreeNode
 import sys
 
@@ -90,11 +90,14 @@ class BinarySearchTree(Generic[K, I]):
         """
         if current is None:  # base case: at the leaf
             current = TreeNode(key, item=item)
+            current.subtree_size = 1
             self.length += 1
         elif key < current.key:
             current.left = self.insert_aux(current.left, key, item)
+            current.subtree_size = 1 + self.get_subtree_size(current.left) + self.get_subtree_size(current.right)
         elif key > current.key:
             current.right = self.insert_aux(current.right, key, item)
+            current.subtree_size = 1 + self.get_subtree_size(current.left) + self.get_subtree_size(current.right)
         else:  # key == current.key
             raise ValueError('Inserting duplicate item')
         return current
@@ -131,21 +134,47 @@ class BinarySearchTree(Generic[K, I]):
             current.item = succ.item
             current.right = self.delete_aux(current.right, succ.key)
 
+        current.subtree_size = 1 + self.get_subtree_size(current.left) + self.get_subtree_size(current.right)
         return current
-
+    def get_subtree_size(self, node: TreeNode) -> int:
+        """
+            Returns the size of the subtree rooted at current.
+        """
+        if node is None:
+            return 0
+        else:
+            return node.subtree_size
+        
     def get_successor(self, current: TreeNode) -> TreeNode:
         """
             Get successor of the current node.
             It should be a child node having the smallest key among all the
             larger keys.
         """
-        raise NotImplementedError()
+        if current is None: 
+            return None
+        if current.right is None:
+            return self.get_minimal(current.right)
+        else: 
+            ancestor = None
+            node = self.root
+            while node is not None: 
+                if current.key < node.key:
+                    ancestor = node
+                    node = node.left
+                else: 
+                    node = node.right
+            return ancestor
 
     def get_minimal(self, current: TreeNode) -> TreeNode:
         """
             Get a node having the smallest key in the current sub-tree.
         """
-        raise NotImplementedError()
+        if current is None :
+            return None
+        while current.left is not None :
+            current = current.left
+        return current
 
     def is_leaf(self, current: TreeNode) -> bool:
         """ Simple check whether or not the node is a leaf. """
@@ -176,4 +205,28 @@ class BinarySearchTree(Generic[K, I]):
         """
         Finds the kth smallest value by key in the subtree rooted at current.
         """
-        raise NotImplementedError()
+        left_size = self.get_subtree_size(current.left)
+        if k == left_size + 1:
+            return current
+        elif k <= left_size + 1:
+            return self.kth_smallest(k, current.left)
+        else:
+            return self.kth_smallest(k - left_size - 1, current.right)
+
+    def in_order(self) -> List[T]:
+        """
+        Returns a list of all the items in the tree in order.
+        """
+        result = []
+        self.in_order_aux(self.root, result)
+        return result
+    
+    def in_order_aux(self, current: TreeNode, result: List[T]) -> None:
+        """
+        Adds all the items in the tree in order to result.
+        """
+        if current is not None:
+            self.in_order_aux(current.left, result)
+            result.append(current.item)
+            self.in_order_aux(current.right, result)
+    

@@ -9,16 +9,20 @@ I = TypeVar("I")
 class Percentiles(Generic[T]):
 
     def __init__(self) -> None:
-        raise NotImplementedError()
+        self.data = BinarySearchTree()
     
     def add_point(self, item: T):
-        raise NotImplementedError()
+        self.data.insert_aux(self.data.root, item, T)
     
     def remove_point(self, item: T):
-        raise NotImplementedError()
+        self.data.delete_aux(self.data.root, T)
 
     def ratio(self, x, y):
-        raise NotImplementedError()
+        result = []
+        for value in self.data.in_order():
+            if x < value < y:
+                result.append(value)
+        return result
 
 if __name__ == "__main__":
     points = list(range(50))
@@ -29,3 +33,5 @@ if __name__ == "__main__":
         p.add_point(point)
     # Numbers from 8 to 16.
     print(p.ratio(15, 66))
+
+# python3 run_tests.py 2
