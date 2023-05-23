@@ -8,7 +8,7 @@ from __future__ import annotations
 __author__ = 'Brendon Taylor, modified by Alexey Ignatiev, further modified by Jackson Goerner'
 __docformat__ = 'reStructuredText'
 
-from typing import TypeVar, Generic
+from typing import List,TypeVar, Generic
 from node import TreeNode
 import sys
 
@@ -212,3 +212,21 @@ class BinarySearchTree(Generic[K, I]):
             return self.kth_smallest(k, current.left)
         else:
             return self.kth_smallest(k - left_size - 1, current.right)
+
+    def in_order(self) -> List[T]:
+        """
+        Returns a list of all the items in the tree in order.
+        """
+        result = []
+        self.in_order_aux(self.root, result)
+        return result
+    
+    def in_order_aux(self, current: TreeNode, result: List[T]) -> None:
+        """
+        Adds all the items in the tree in order to result.
+        """
+        if current is not None:
+            self.in_order_aux(current.left, result)
+            result.append(current.item)
+            self.in_order_aux(current.right, result)
+    
